@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+           http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd 
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+    <context:component-scan base-package="com.chusu.apps.service"/>
+    <context:component-scan base-package="com.chusu.platform.core.*.impl"/>
+    <context:component-scan base-package="com.chusu.platform.ehcache"/>
+    
+    <!-- 引入jdbc配置文件 -->
+    <context:property-placeholder location="classpath:config/jdbc.properties"/>
+    
+    <!-- 配置datasource -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="driverClassName" value="${jdbc.driverClassName}" /> 
+		<property name="url" value="${jdbc.url}" /> 
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="${jdbc.initialSize}" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxWait" value="${jdbc.maxWait}" /> 
+		<property name="minIdle" value="${jdbc.minIdle}" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->  
+       <property name="timeBetweenEvictionRunsMillis" value ="${jdbc.timeBetweenEvictionRunsMillis}" />  
+       <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->  
+       <property name="minEvictableIdleTimeMillis" value ="${jdbc.minEvictableIdleTimeMillis}" />    
+       <property name="validationQuery" value="${jdbc.validationQuery}" />    
+       <property name="maxOpenPreparedStatements" value ="${jdbc.maxOpenPreparedStatements}" />  
+       <!-- 打开 removeAbandoned 功能 -->  
+       <property name="removeAbandoned" value="${jdbc.removeAbandoned}" />  
+       <property name="removeAbandonedTimeout" value ="${jdbc.removeAbandonedTimeout}" />  
+       <property name="logAbandoned" value="${jdbc.logAbandoned}" />
+       <property name="filters" value="${jdbc.filters}" />    
+	</bean>
+	
+	<!-- 配置sqlSessionFactory -->
+	<!-- 配置sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:spring/sqlmap-config.xml" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath*:sqlmap/**/*.xml"></property>
+		<property name="typeAliasesPackage" value="com.chusu.apps.model"/>
+		<property name="plugins"> 
+	        <array>
+	            <bean class="com.github.pagehelper.PageInterceptor">
+	                <property name="properties">
+	                    <value>
+	                        helperDialect=mysql
+	                        reasonable=true
+	                        supportMethodsArguments=true
+	                        params=count=countSql
+	                        autoRuntimeDialect=true
+	                    </value>
+	                </property>
+	            </bean>
+	        </array>
+	    </property>
+	</bean>
+	
+	<bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.chusu.*.dao" />
+		<property name="properties">
+	        <value>
+	            mappers=tk.mybatis.mapper.common.Mapper
+	        </value>
+	    </property>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    
+    <aop:config>
+        <aop:pointcut id="perform" expression="execution(* com.chusu.*.service.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="perform"/>
+    </aop:config>
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    
+    <bean id="fespExceptionResolver" class="com.chusu.platform.core.exception.FespExceptionResolver" />
+	<bean class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="cacheManagerFactory"></property>
+	</bean>
+	<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:config/ehcache.xml" />
+	</bean>
+
+</beans>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chusu.apps.dao.order.OrdersMapper">
+  <resultMap id="BaseResultMap" type="com.chusu.apps.model.order.Orders">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_type" jdbcType="VARCHAR" property="orderType" />
+    <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="order_des" jdbcType="LONGVARCHAR" property="orderDes" />
+  </resultMap>
+
+
+  <!-- 订单 数据查询 类型 -->
+  <select id="selectOrderList" resultMap="BaseResultMap" parameterType="java.util.Map">
+
+      SELECT	o.*,d.`id` dId,d.`department_name` department_name ,t.`id` tId,t.`type_name`  type_name FROM `orders` o
+
+    LEFT JOIN   `department` d ON o.`department_id` = d.`id`
+
+    LEFT JOIN `type` t  ON o.`type_id` = t.`id`
+   <where>
+
+
+      <if test="order_type != null and order_type != ''">
+        AND o.order_type = #{order_type}
+      </if>
+       <if test="id != null and id != ''">
+           AND d.id = #{id}
+       </if>
+       <if test="name != null and name != ''">
+           AND t.type_name LIKE  #{name}
+       </if>
+       <if test="startTime != null and  startTime != ''">
+           <![CDATA[
+           AND DATE_FORMAT(o.`create_time`, '%Y~%m~%d %H:%M:%S' ) >= DATE_FORMAT(#{startTime}, '%Y~%m~%d %H:%M:%S' )
+            ]]>
+       </if>
+       <if test="endTime != null and endTime != ''">
+           <![CDATA[
+           AND  DATE_FORMAT(o.`create_time`, '%Y~%m~%d %H:%M:%S' ) <= DATE_FORMAT(#{endTime}, '%Y~%m~%d %H:%M:%S' )
+           ]]>
+       </if>
+   </where>
+    ORDER BY 	o.`time` DESC
+      <if test="size != null ">
+    limit #{offset},#{size}
+      </if>
+  </select>
+
+
+  <select id="selectOrderCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+
+    SELECT count(*) FROM orders o
+    LEFT JOIN   `department` d ON o.`department_id` = d.`id`
+    LEFT JOIN `type` t  ON o.`type_id` = t.`id`
+    <where>
+      <if test="order_type != null and order_type != ''">
+        AND o.order_type = #{order_type}
+      </if>
+        <if test="id != null and id != ''">
+            AND d.id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            AND t.type_name LIKE  #{name}
+        </if>
+        <if test="startTime != null and  startTime != ''">
+            <![CDATA[
+           AND DATE_FORMAT(o.`create_time`, '%Y~%m~%d %H:%M:%S' ) >= DATE_FORMAT(#{startTime}, '%Y~%m~%d %H:%M:%S' )
+            ]]>
+        </if>
+        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+           AND  DATE_FORMAT(o.`create_time`, '%Y~%m~%d %H:%M:%S' ) <= DATE_FORMAT(#{endTime}, '%Y~%m~%d %H:%M:%S' )
+           ]]>
+        </if>
+    </where>
+  </select>
+
+
+
+
+  <!-- 查询 医院物资 统计 -->
+  <select id="selectOrderListAll" resultMap="BaseResultMap" parameterType="java.util.Map">
+
+     SELECT  fe.numbers ,fe.type_name , fe.typeId , fe.police ,fe.departmentId  FROM  (
+    SELECT COALESCE(SUM(  d.`number`),0) numbers ,t.`type_name` type_name ,t.`id` typeId , t.police  police ,d.`department_id`  departmentId   FROM  `orders` d
+
+    LEFT JOIN   `type` t ON d.`type_id` = t.`id`
+      LEFT JOIN   `department` da ON  da.id = d.`department_id`
+    <where>
+      <if test="order_type != null and order_type != ''">
+        AND d.order_type = #{order_type}
+      </if>
+        <if test="startTime != null and  startTime != ''">
+            <![CDATA[
+           AND DATE_FORMAT(d.`create_time`, '%Y~%m~%d %H:%M:%S' ) >= DATE_FORMAT(#{startTime}, '%Y~%m~%d %H:%M:%S' )
+            ]]>
+        </if>
+        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+           AND  DATE_FORMAT(d.`create_time`, '%Y~%m~%d %H:%M:%S' ) <= DATE_FORMAT(#{endTime}, '%Y~%m~%d %H:%M:%S' )
+           ]]>
+        </if>
+        <if test="name != null and name != ''">
+            AND t.type_name LIKE  #{name}
+        </if>
+        <if test="typeId != null and typeId != ''">
+            AND t.id  =   #{typeId}
+        </if>
+        <if test="departmentId != null and departmentId != ''">
+            AND da.id =  #{departmentId}
+        </if>
+    </where>
+
+       GROUP BY   t.`id`
+
+      <if test="numbers != null and numbers != ''">
+          ORDER BY numbers DESC
+      </if>
+
+      ) fe
+
+      <if test="size != null ">
+         limit #{offset},#{size}
+      </if>
+  </select>
+
+
+  <select id="selectOrderListAllCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+    <!--SELECT  COUNT(*) FROM `type` t-->
+      <!--<where>-->
+      <!--<if test="name != null and name != ''">-->
+          <!--AND t.type_name LIKE  #{name}-->
+      <!--</if>-->
+      <!--</where>-->
+     SELECT  COUNT(dde.typeId) FROM ( SELECT COALESCE(SUM( d.`number`),0) numbers ,t.`type_name` type_name ,t.`id` typeId , t.police police FROM
+      `orders` d
+
+      LEFT JOIN `type` t ON d.`type_id` = t.`id`
+      LEFT JOIN `department` da ON da.id = d.`department_id`
+      <where>
+          <if test="order_type != null and order_type != ''">
+              AND d.order_type = #{order_type}
+          </if>
+          <if test="startTime != null and  startTime != ''">
+              <![CDATA[
+           AND DATE_FORMAT(d.`create_time`, '%Y~%m~%d %H:%M:%S' ) >= DATE_FORMAT(#{startTime}, '%Y~%m~%d %H:%M:%S' )
+            ]]>
+          </if>
+          <if test="endTime != null and endTime != ''">
+              <![CDATA[
+           AND  DATE_FORMAT(d.`create_time`, '%Y~%m~%d %H:%M:%S' ) <= DATE_FORMAT(#{endTime}, '%Y~%m~%d %H:%M:%S' )
+           ]]>
+          </if>
+          <if test="name != null and name != ''">
+              AND t.type_name LIKE #{name}
+          </if>
+          <if test="typeId != null and typeId != ''">
+              AND t.id = #{typeId}
+          </if>
+          <if test="departmentId != null and departmentId != ''">
+              AND da.id = #{departmentId}
+          </if>
+      </where>
+
+      GROUP BY t.`id`
+
+      ) dde
+
+  </select>
+
+
+  <!-- 查询  各科室 各种类 最新时间 的数据统计  -->
+  <select id="selectOrderListTimes" resultMap="BaseResultMap" parameterType="java.util.Map">
+
+ SELECT * FROM `orders` os
+    WHERE   os.id  IN
+ ( SELECT fe.ids FROM   (SELECT MAX(o.create_time),o.id ids FROM `orders` o
+    , (SELECT * FROM `department`
+
+      where    id = #{id}
+
+    ) d ,`type` t
+    WHERE  o.`department_id` = d.id  AND o.`type_id` = t.`id` AND o.order_type = 1
+
+
+    GROUP BY t.id) fe
+    )
+  </select>
+
+
+
+</mapper>

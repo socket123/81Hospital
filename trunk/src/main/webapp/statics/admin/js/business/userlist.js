@@ -1,0 +1,37 @@
+/**
+ * Created by LXX on 2017-06-17.
+ */
+$(document).ready(function(){
+
+    $(".btn_search").on("click",function(){
+        var userName = $("input[name='userName']").val();
+        var phone = $("input[name='phone']").val();
+        if(userName!=""){
+            userName='userName='+userName;
+        }
+        if(phone!=""){
+            phone='phone='+phone;
+        }
+        location.href = url+'admin/user/list?'+userName+phone;
+    });
+
+    $(".edit").on("click",function(){
+        var id = $(this).parent().find("input[name='id']").val();
+        location.href = url+'admin/user/mergepage?id='+id;
+    });
+
+    $(".btn_trash").on("click",function(){
+        if(confirm("确定删除此条记录么？删除后将不能恢复！")){
+            var id = $(this).parent().find("input[name='id']").val();
+            $.post(url+"admin/user/del",{id:id},function(data){
+                if(data > 0){
+                    alert("删除成功！");
+                    location.href = url+'admin/user/list';
+                }else{
+                    alert("操作失败！");
+                    return;
+                }
+            });
+        }
+    });
+});

@@ -1,0 +1,43 @@
+
+.disnoe{display: none;}
+
+
+/*.mains{display:none ;width: 100%;height: 400px;}*/
+
+.disnoe_how{display: none;}
+
+
+.talkbubble {
+    padding: 15px;
+    width: 150px;
+    height: 75px;
+    color: #000;
+    background: #95c9e2;
+    position: relative;
+    -moz-border-radius:    10px;
+    -webkit-border-radius: 10px;
+    border-radius:         30px;
+    margin:  0 10px 10px 0;
+    float: left;
+
+
+    -moz-box-shadow:5px -1px 5px #858585; -webkit-box-shadow:5px -1px 5px #858585; box-shadow:5px -1px 5px #858585;
+
+}
+
+.zhongl{
+    margin: 0 0  5px 0 !important;
+}
+/*.talkbubble:before {*/
+    /*content:"";*/
+    /*position: absolute;*/
+    /*right: 100%;*/
+    /*top: 24px;*/
+    /*width: 0;*/
+    /*height: 0;*/
+    /*border-top: 13px solid transparent;*/
+    /*border-right: 26px solid #8dfa69;*/
+    /*border-bottom: 13px solid transparent;*/
+/*}*/
+
+.disnoe{margin:15px 0px 0px 0px !important;}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chusu.apps.dao.business.UserMapper">
+  <resultMap id="BaseResultMap" type="com.chusu.apps.model.business.User">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="unionID" jdbcType="INTEGER" property="unionid" />
+    <result column="card_num" jdbcType="INTEGER" property="cardNum" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="commen_address" jdbcType="VARCHAR" property="commenAddress" />
+    <result column="wx_number" jdbcType="VARCHAR" property="wxNumber" />
+    <result column="qq_number" jdbcType="VARCHAR" property="qqNumber" />
+    <result column="sex" jdbcType="TINYINT" property="sex" />
+    <result column="ip_address" jdbcType="VARCHAR" property="ipAddress" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+  </resultMap>
+</mapper>

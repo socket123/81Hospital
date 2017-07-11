@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chusu.apps.dao.sys.SysDictDataMapper">
+  <resultMap id="BaseResultMap" type="com.chusu.apps.model.sys.SysDictData">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="dict_code" jdbcType="VARCHAR" property="dictCode" />
+    <result column="dictdata_value" jdbcType="VARCHAR" property="dictdataValue" />
+    <result column="dictdata_name" jdbcType="VARCHAR" property="dictdataName" />
+    <result column="is_fixed" jdbcType="INTEGER" property="isFixed" />
+    <result column="order_no" jdbcType="INTEGER" property="orderNo" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="modify_time" jdbcType="DATE" property="modifyTime" />
+    <result column="is_visible" jdbcType="INTEGER" property="isVisible" />
+  </resultMap>
+</mapper>

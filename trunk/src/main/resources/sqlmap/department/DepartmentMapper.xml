@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chusu.apps.dao.department.DepartmentMapper">
+  <resultMap id="BaseResultMap" type="com.chusu.apps.model.department.Department">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="department_introduce" jdbcType="LONGVARCHAR" property="departmentIntroduce" />
+  </resultMap>
+
+
+
+
+
+</mapper>

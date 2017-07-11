@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chusu.apps.dao.type.TypeMapper">
+  <resultMap id="BaseResultMap" type="com.chusu.apps.model.type.Type">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="police" jdbcType="VARCHAR" property="police" />
+    <result column="type_des" jdbcType="LONGVARCHAR" property="typeDes" />
+  </resultMap>
+
+
+
+  <!-- 查询  各科室 各种类 的数据统计  根据部门查询 可是物资 统计 -->
+  <select id="selectTypetList" resultMap="BaseResultMap" parameterType="java.util.Map">
+    SELECT  COALESCE(SUM(  o.`number`),0) numbers, t.id ,t.`type_name`,t.police    FROM department  d
+
+    LEFT JOIN `orders` o  ON d.`id` = o.`department_id`
+
+    LEFT JOIN   `type` t ON o.`type_id` = t.`id`
+
+    WHERE  o.`order_type` = 1
+    <if test="id != null and id != ''">
+      AND d.id = #{id}
+    </if>
+    <if test="name != null and name != ''">
+      AND t.type_name LIKE  #{name}
+    </if>
+
+    GROUP BY t.id
+    <if test="size != null  ">
+    limit #{offset},#{size}
+    </if>
+  </select>
+
+
+  <select id="sselectTypetListCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+  SELECT COUNT(ds.id)  FROM (  SELECT t.id FROM department  d
+
+    LEFT JOIN `orders` o  ON d.`id` = o.`department_id`
+
+    LEFT JOIN   `type` t ON o.`type_id` = t.`id`
+
+    WHERE  o.`order_type` = 1
+    <if test="id != null and id != ''">
+      AND d.id = #{id}
+    </if>
+    <if test="name != null and name != ''">
+      AND t.type_name LIKE  #{name}
+    </if>
+    GROUP BY t.id
+    ) ds
+
+  </select>
+</mapper>

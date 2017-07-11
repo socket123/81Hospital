@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+           http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd 
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd 
+           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd ">
+    <context:component-scan base-package="com.chusu.apps.controller"/>
+	<!-- 支持上传文件 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <property name="defaultEncoding" value="utf-8"></property>   
+        <property name="maxUploadSize" value="10485760"></property>  
+        <property name="maxInMemorySize" value="40960"></property>  
+   </bean> 
+	
+    <!-- 避免IE在ajax请求时，返回json出现下载 -->
+    <bean id="jsonConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+	<bean id="stringConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/plain;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="stringConverter"/>
+                <ref bean="jsonConverter"/>
+            </list>
+        </property>
+    </bean>
+    
+    <mvc:annotation-driven/>
+	<mvc:default-servlet-handler/>
+    
+    <!-- spring mvc对静态资源的访问 -->
+    <mvc:resources location="/js/" mapping="/js/**"></mvc:resources>
+    <mvc:resources location="/css/" mapping="/css/**"></mvc:resources>
+    <mvc:resources location="/editor/" mapping="/editor/**"></mvc:resources>
+    <mvc:resources location="/image/" mapping="/image/**"></mvc:resources>
+    <mvc:resources location="/pdfviewer/" mapping="/pdfviewer/**"></mvc:resources>
+    
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	    <property name="prefix" value="/pages/" />
+	    <property name="suffix" value=".jsp" />
+    </bean>
+    
+    <!-- 启动拦截器功能 -->
+    <!-- 自定义拦截器,映射路径后缀名   -->
+    <!--   -->
+	<mvc:interceptors>  
+        <mvc:interceptor>
+            <mvc:mapping path="/admin/*"/>
+            <mvc:mapping path="/admin/*/*"/>
+            <bean class="com.chusu.apps.interceptor.SessionTimeoutInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>  
+    
+    <!-- task任务扫描注解 -->
+    <task:annotation-driven/>
+</beans>
